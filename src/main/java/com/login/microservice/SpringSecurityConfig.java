@@ -11,13 +11,15 @@ import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.login.microservice.services.JPAUserDetailsService;
+//import com.login.microservice.services.JPAUserDetailsService;
 
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
 	
-	@Autowired
-	private JPAUserDetailsService userds;
+//	@Autowired
+//	private JPAUserDetailsService userds;
+	
+//	private BCryptPasswordEncoder passwordEncoder;
 	
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -28,30 +30,42 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	public void configurerGlobal(AuthenticationManagerBuilder builder) throws Exception{
 		
-//		In Memory
-//		PasswordEncoder encoder = passwordEncoder();
-//		UserBuilder users = User.builder().passwordEncoder(encoder::encode);
-//		
-//		builder.inMemoryAuthentication()
-//			.withUser(users.username("admin").password("1234").roles("ADMIN", "USER")) //en forma automática el 1234 se va a encriptar.
-//			.withUser(users.username("Pablo").password("1234").roles("USER"));
 		
-		builder.userDetailsService(userds);
+//		In Memory
+		PasswordEncoder encoder = passwordEncoder();
+		UserBuilder users = User.builder().passwordEncoder(encoder::encode);
+		
+		builder.inMemoryAuthentication()
+			.withUser(users.username("admin").password("1234").roles("ADMIN", "USER")) //en forma automática el 1234 se va a encriptar.
+			.withUser(users.username("Pablo").password("1234").roles("USER"));
+		
+//		builder.userDetailsService(userds)
+//		.passwordEncoder(passwordEncoder);
 	}
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+//	@Override
+//	protected void configure(HttpSecurity http) throws Exception {
 		
-		http.authorizeRequests().antMatchers("/","/css/**","/js/**", "/images/**", "/listar/", "/api/**").permitAll()
-								.anyRequest().authenticated()
-								.and()
-								.formLogin().loginPage("/login")
-								.permitAll()
-								.and()
-								.logout().permitAll();	
+//		http.authorizeRequests().antMatchers("/").permitAll();
+//								.anyRequest().authenticated();
+//								.and()
+//								.formLogin().loginPage("/login")
+//								.permitAll()
+//								.and()
+//								.logout().permitAll();	
 							     
-	}
+//	}
 	
-	
+    @Override
+protected void configure(HttpSecurity http) 
+  throws Exception {
+    http.csrf().disable()
+      .authorizeRequests()
+      .antMatchers("/login").permitAll()
+      .anyRequest()
+      .authenticated()
+      .and()
+      .httpBasic();
+}
 
 }
